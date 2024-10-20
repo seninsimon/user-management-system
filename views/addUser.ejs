@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add User</title>
+    <style>
+        form {
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 20px;
+        }
+        .action-btn {
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .submit-btn {
+            background-color: #4CAF50;
+        }
+        .cancel-btn {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add New User</h1>
+    <form action="/addUser" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="mobile">Mobile:</label>
+        <input type="text" id="mobile" name="mobile" required>
+
+        <button type="submit" class="action-btn submit-btn">Submit</button>
+        <a href="/adminpanel" class="action-btn cancel-btn">Cancel</a>
+    </form>
+</body>
+</html>
