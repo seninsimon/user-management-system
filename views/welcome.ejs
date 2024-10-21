@@ -1,1 +1,28 @@
-haii welcome
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="/css/welcome.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <a href="/">Home</a>
+
+    </nav>
+
+    <!-- Welcome Section -->
+    <div class="welcome-container">
+        <h1>Welcome, <%= username %>!</h1>
+        <p>We're glad to have you here.</p>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Your Website. All rights reserved.</p>
+    </footer>
+</body>
+</html>

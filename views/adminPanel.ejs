@@ -3,43 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Table</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .action-btn {
-            padding: 5px 10px;
-            text-decoration: none;
-            color: white;
-            border-radius: 5px;
-        }
-        .edit-btn {
-            background-color: #4CAF50;
-        }
-        .delete-btn {
-            background-color: #f44336;
-        }
-        .add-user-btn {
-            background-color: #008CBA;
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>User Management</title>
+    <link rel="stylesheet" href="/css/adminpanel.css">
 </head>
 <body>
-    <h1>User List</h1>
+    <div class="navbar">
+        <h1>User Management</h1>
+        <a href="/admin/logout">Logout</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="searchbar">
+        <form action="/adminpanel/searchuser" method="get">
+            <input type="text" name="search" placeholder="Search by username or email" />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Add User Button -->
     <a href="/addUser" class="action-btn add-user-btn">Add User</a>
+
+    <!-- User Table -->
     <table>
         <thead>
             <tr>
@@ -47,7 +31,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Mobile</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -67,5 +51,10 @@
             <% }); %>
         </tbody>
     </table>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Your Company. All rights reserved.</p>
+    </footer>
 </body>
 </html>

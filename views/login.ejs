@@ -4,60 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+    <link rel="stylesheet" href="/css/login.css">
+    <script>
+        function validateLoginForm() {
+            // Get form inputs
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Username validation (non-empty)
+            if (username === "") {
+                alert("Please enter your username.");
+                return false;
+            }
+
+            // Password validation (non-empty)
+            if (password === "") {
+                alert("Please enter your password.");
+                return false;
+            }
+
+            // If both checks pass
+            return true;
         }
-        form {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .action-btn {
-            padding: 10px 15px;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .submit-btn {
-            background-color: #4CAF50;
-            width: 100%;
-        }
-        .cancel-btn {
-            background-color: #f44336;
-            width: 100%;
-        }
-    </style>
+    </script>
 </head>
 <body>
-    <h1 style="text-align: center;">User Login</h1>
-    <form action="/login" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+    <form action="/login" method="POST" onsubmit="return validateLoginForm();">
+        <h1>User Login</h1>
+        
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
         <button type="submit" class="action-btn submit-btn">Login</button>
+
         <a href="/register" class="action-btn cancel-btn">Register</a>
     </form>
 </body>

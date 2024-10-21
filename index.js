@@ -6,8 +6,23 @@ const db = require('./dbConnection/db')
 db()
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
+const session = require('express-session')
+const nocache = require('nocache')
+app.use(nocache());
+const bcrypt = require('bcrypt');
 
 
+app.use(express.static('public'))
+
+
+app.use(session(
+    {
+        secret: 'my-secret-key',
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false }
+    }
+))
 
 
 app.use(express.json())
@@ -26,14 +41,23 @@ app.get('/', (req, res) => {
 //register route
 
 app.get('/register', (req, res) => {
-    res.render('register')
+    if (req.session.username) {
+        res.redirect('/welcome')
+    }
+    else
+    {
+        res.render('register')
+    }
+    
 })
 
 app.post('/register', async (req, res) => {
     const { username, password, email, mobile } = req.body
-
+     console.log(`username${username}:password${password}`)
     try {
-        const registerUser = await User.create({ username, password, email, mobile })
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        const registerUser = await User.create({ username, password:hashedPassword, email, mobile })
         console.log(registerUser)
         res.redirect('/login')
     } catch (error) {
@@ -43,12 +67,21 @@ app.post('/register', async (req, res) => {
 })
 
 
-
-
 //login route
 
 app.get('/login', (req, res) => {
-    res.render('login')
+
+    if(req.session.admin)
+    {
+         res.redirect('/adminpanel')
+    }
+    else if (req.session.username) {
+        res.redirect('/welcome')
+    }
+    else {
+        res.render('login')
+    }
+
 })
 
 
@@ -58,6 +91,7 @@ app.post('/login', async (req, res) => {
     try {
 
         if (username == 'admin' && password == "admin") {
+            req.session.admin ='admin'
             res.redirect('/adminpanel')
         }
         else {
@@ -67,7 +101,11 @@ app.post('/login', async (req, res) => {
 
             if (findUser) {
 
-                if (findUser.password === password) {
+                
+                const passwordMatch = await bcrypt.compare(password, findUser.password);
+                console.log("boolean val :" ,passwordMatch)
+                if (passwordMatch) {
+                    req.session.username = username
                     res.redirect('/welcome')
                 }
                 else {
@@ -92,7 +130,45 @@ app.post('/login', async (req, res) => {
 //welcome page
 
 app.get('/welcome', (req, res) => {
-    res.render('welcome')
+    const name = req.session.username
+    if(name)
+    {
+        res.render('welcome', { username: name })
+    }
+    else
+    {
+        res.redirect('/login')
+    }
+   
+})
+
+//logout
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.send('Error in destroying session');
+        }
+
+        res.clearCookie('connect.sid');
+        console.log('Session destroyed and logged out');
+        res.redirect('/login')
+
+    })
+})
+
+//admin logout
+
+app.get('/admin/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.send('Error in destroying session');
+        }
+
+        res.clearCookie('connect.sid');
+        console.log('Session admin destroyed and logged out');
+        res.redirect('/login')
+
+    })
 })
 
 
@@ -101,31 +177,76 @@ app.get('/welcome', (req, res) => {
 //admin panel
 
 app.get('/adminpanel', async (req, res) => {
-    try {
 
-        const users = await User.find()
-        // console.log(users)
-        res.render('adminPanel', { users })
+    
+    try {
+        if(req.session.admin)
+            {
+                const users = await User.find()
+                // console.log(users)
+                res.render('adminPanel', { users })
+            }
+            else
+            {
+                res.redirect('/login')
+            }
+
 
     } catch (error) {
         res.status(404).json("error getting users")
     }
 })
 
+// search user
+
+app.get('/adminpanel/searchuser', async (req, res) => {
+    const searchQuery = req.query.search;  // Get the search term from the query string
+
+    try {
+        if(req.session.admin) {
+            // Use a case-insensitive search with regex to match partial input
+            const users = await User.find({
+                $or: [
+                    { username: { $regex: searchQuery, $options: 'i' } },
+                    { email: { $regex: searchQuery, $options: 'i' } }
+                ]
+            });
+
+            res.render('adminPanel', { users });  // Render the search results in admin panel
+        } else {
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.log('Error while searching users:', error);
+        res.status(500).json("Server error occurred while searching");
+    }
+});
+
+
+
 
 //add user 
 
 app.get('/adduser', (req, res) => {
-    res.render('addUser')
+    if(req.session.admin)
+    {
+        res.render('addUser')
+    }
+    else
+    {
+        res.redirect('/login')
+    }
+    
 })
 
 
 app.post('/adduser', async (req, res) => {
-    const { username, email, mobile } = req.body
-    password = "admin"
+    const { username, email, mobile ,password } = req.body
+    
     try {
-
-        const newuser = await User.create({ username, email, mobile ,password})
+  
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newuser = await User.create({ username, email, mobile, password : hashedPassword })
         console.log(newuser);
         res.redirect('/adminpanel')
 
@@ -142,36 +263,42 @@ app.post('/adduser', async (req, res) => {
 app.get('/edituser/:id', async (req, res) => {
     const id = req.params.id
     try {
-        const finduser = await User.findById(id)
-        if(!finduser)
+        if(req.session.admin)
         {
-            return res.status(404).json("user not found")
+            const finduser = await User.findById(id)
+            if (!finduser) {
+                return res.status(404).json("user not found")
+            }
+    
+            res.render('edituser', { finduser })
+            console.log("person to edit :", finduser)
         }
-
-        res.render('edituser',{finduser})
-        console.log("person to edit :",finduser)
+        else
+        {
+            res.redirect("/login")
+        }
+       
 
 
 
     } catch (error) {
-        
+
         console.log("user not found for editing")
     }
 })
 
 
-app.put('/edituser/:id', async (req,res)=>
-{
+app.put('/edituser/:id', async (req, res) => {
     const id = req.params.id
 
     try {
 
-        const updateuser = await User.findByIdAndUpdate(id,req.body)
+        const updateuser = await User.findByIdAndUpdate(id, req.body)
         console.log(updateuser)
         res.redirect('/adminpanel')
-        
+
     } catch (error) {
-        
+
         console.log(error)
     }
 })
@@ -179,29 +306,23 @@ app.put('/edituser/:id', async (req,res)=>
 
 //delete user
 
-
-
-
-app.delete('/deleteuser/:id', async (req,res)=>
-{
+app.delete('/deleteuser/:id', async (req, res) => {
 
     const id = req.params.id
     try {
         const deleteuser = await User.findByIdAndDelete(id)
-        console.log("deleted user : ",deleteuser)
+        console.log("deleted user : ", deleteuser)
         res.redirect('/adminpanel')
     } catch (error) {
         console.log(error);
-        
+
     }
 })
 
 
+//search users
 
-
-
-
-
+  
 
 
 

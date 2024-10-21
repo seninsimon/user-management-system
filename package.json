@@ -13,9 +13,12 @@
     "nodemon": "^3.1.7"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "express-session": "^1.18.1",
     "method-override": "^3.0.0",
-    "mongoose": "^8.7.2"
+    "mongoose": "^8.7.2",
+    "nocache": "^4.0.0"
   }
 }

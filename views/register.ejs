@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+    <link rel="stylesheet" href="/css/register.css">
+    <script>
+        function validateForm() {
+            // Get form inputs
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const mobile = document.getElementById('mobile').value;
+
+            // Username validation (minimum 3 characters)
+            if (username.length < 3) {
+                alert("Username must be at least 3 characters long.");
+                return false;
+            }
+
+            // Password validation (minimum 6 characters)
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                return false;
+            }
+
+            // Email validation (simple regex pattern)
+            const emailPattern = /^[a-zA-Z][a-zA-Z.-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+
+            // Mobile number validation (10 digits)
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobile)) {
+                alert("Mobile number must be 10 digits.");
+                return false;
+            }
+
+            // If all checks pass
+            return true;
         }
-        form {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .action-btn {
-            padding: 10px 15px;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .submit-btn {
-            background-color: #4CAF50;
-            width: 100%;
-        }
-        .cancel-btn {
-            background-color: #f44336;
-            width: 100%;
-        }
-    </style>
+    </script>
 </head>
+
 <body>
-    <h1 style="text-align: center;">User Registration</h1>
-    <form action="/register" method="POST">
+    <form action="/register" method="POST" onsubmit="return validateForm();">
+        <h1>User Registration</h1>
+
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
 
@@ -67,5 +67,5 @@
         <a href="/" class="action-btn cancel-btn">Cancel</a>
     </form>
 </body>
-</html>
 
+</html>
